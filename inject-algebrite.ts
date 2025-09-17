@@ -25,6 +25,35 @@ new HTMLRewriter()
     // alert("js_to_cs: com=" + com);
     cdy.evokeCS(com);
   }
+
+  var emucache = {};
+  var convdict = { "diff": "d", "integrate": "integral" };
+  async function emulateMxfun(suffix, base /*, arg1, arg2, ... */) {
+    console.log("[emulateMxfun]", arguments);
+
+    if (convdict[base] !== undefined) {
+      base = convdict[base];
+    }
+
+    var args = Array.prototype.slice.call(arguments, 2);
+    if (args.length > 0) {
+      var argstr = args.join(", ");
+      var stmt = base + "(" + argstr + ")";
+    } else {
+      var stmt = base;
+    }
+    console.log("[emulateMxfun] stmt:", stmt);
+
+    var hashkey = Array.from(new Uint8Array(await crypto.subtle.digest('sha-256', new TextEncoder().encode(stmt)))).map(b => b.toString(16).padStart(2, '0')).join('');
+    if (emucache[hashkey] !== undefined) {
+      console.log("[emulateMxfun] cached", hashkey);
+      return;
+    }
+
+    cdy.evokeCS("mx" + suffix + ' = "' + Algebrite.run(stmt) + '"');
+    emucache[hashkey] = true;
+    console.log("[emulateMxfun] emulated", hashkey);
+  }
 </script>
         `,
           { html: true },
@@ -74,6 +103,10 @@ exealg(com) := (
 
 alert(str) := (
   javascript("alert('"+str+"')");
+);
+
+Mxfun(suffix, base, args) := (
+  javascript("emulateMxfun('" + suffix + "', '" + base + "'" + sum(args, ", '" + # + "'") + ")");
 );
         `.trim(),
       );
