@@ -81,4 +81,4 @@ alert(str) := (
   })
   .transform(new Response(Bun.stdin))
   .arrayBuffer()
-  .then((buffer) => process.stdout.write(buffer));
+  .then((buffer) => process.stdout.write(new Uint8Array(buffer)));
