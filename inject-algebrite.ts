@@ -1,3 +1,5 @@
+export {};
+
 const algebrite = await Bun.file(
   "node_modules/algebrite/dist/algebrite.bundle-for-browser.js",
 ).text();
