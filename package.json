@@ -4,5 +4,8 @@
   "private": true,
   "dependencies": {
     "algebrite": "^1.4.0"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.2.22"
   }
 }
